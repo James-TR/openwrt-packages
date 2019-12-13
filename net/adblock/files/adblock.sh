@@ -13,7 +13,7 @@
 #
 LC_ALL=C
 PATH="/usr/sbin:/usr/bin:/sbin:/bin"
-adb_ver="3.8.14"
+adb_ver="3.8.13"
 adb_basever=""
 adb_enabled=0
 adb_debug=0
@@ -604,7 +604,7 @@ f_list()
 				out_rc="${?}"
 				if [ "${out_rc}" -eq 0 ]
 				then
-					adb_whitelist_rset="/^([[:alnum:]_-]+\\.)+[[:alpha:]]+([[:space:]]|$)/{gsub(\"\\\\.\",\"\\\\.\",\$1);print tolower(\"^(|.*\\\\.)\"\$1\"$\")}"
+					adb_whitelist_rset="/^([[:alnum:]_-]+\\.)+[[:alpha:]]+([[:space:]]|$)/{gsub(\"\\\\.\",\"\\\\.\",\$1);print tolower(\"^\"\$1\"\\\\|\\\\.\"\$1)}"
 					awk "${adb_whitelist_rset}" "${adb_tmpdir}/tmp.raw.${mode}" > "${adb_tmpdir}/tmp.rem.${mode}"
 					out_rc="${?}"
 					if [ "${out_rc}" -eq 0 ] && [ -n "${adb_dnsallow}" ]
@@ -613,7 +613,6 @@ f_list()
 						out_rc="${?}"
 					fi
 				fi
-				rm -f "${adb_tmpdir}/tmp.raw.${mode}"
 			fi
 		;;
 		"backup")
@@ -671,7 +670,7 @@ f_list()
 			fi
 			if [ -s "${adb_tmpdir}/tmp.rem.whitelist" ]
 			then
-				egrep -vf "${adb_tmpdir}/tmp.rem.whitelist" "${adb_tmpdir}/${adb_dnsfile}" | eval "${adb_dnsdeny}" >> "${adb_dnsdir}/${adb_dnsfile}"
+				grep -vf "${adb_tmpdir}/tmp.rem.whitelist" "${adb_tmpdir}/${adb_dnsfile}" | eval "${adb_dnsdeny}" >> "${adb_dnsdir}/${adb_dnsfile}"
 			else
 				eval "${adb_dnsdeny}" "${adb_tmpdir}/${adb_dnsfile}" >> "${adb_dnsdir}/${adb_dnsfile}"
 			fi
